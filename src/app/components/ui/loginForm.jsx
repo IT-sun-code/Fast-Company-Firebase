@@ -11,18 +11,18 @@ const LoginForm = () => {
         password: "",
         stayOn: false
     });
-
-    // Добавила провайдер и историю для переадресации
     const history = useHistory();
     const { logIn } = useAuth();
-
     const [errors, setErrors] = useState({});
+    const [enterError, setEnterError] = useState(null);
     const handleChange = (target) => {
         setData((prevState) => ({
             ...prevState,
             [target.name]: target.value
         }));
+        setEnterError(null);
     };
+
     const validatorConfig = {
         email: {
             isRequired: {
@@ -45,7 +45,6 @@ const LoginForm = () => {
     };
     const isValid = Object.keys(errors).length === 0;
 
-    // Добавила переадресацию на главную страницу_______________________________
     const handleSubmit = async (e) => {
         e.preventDefault();
         const isValid = validate();
@@ -55,8 +54,7 @@ const LoginForm = () => {
             await logIn(data);
             history.push("/");
         } catch (error) {
-            setErrors(error);
-            // setEnterError(error.message);
+            setEnterError(error.message);
         }
     };
     return (
@@ -83,10 +81,11 @@ const LoginForm = () => {
             >
                 Оставаться в системе
             </CheckBoxField>
+            {enterError && <p className="text-danger">{enterError}</p>}
             <button
                 className="btn btn-primary w-100 mx-auto"
                 type="submit"
-                disabled={!isValid}
+                disabled={!isValid || enterError}
             >
                 Submit
             </button>
